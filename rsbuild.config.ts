@@ -10,7 +10,7 @@ export default defineConfig({
   server: {
     base: '/react-template',
 		host: '0.0.0.0',
-    port: 5678,
+    port: 5200,
   },
-  plugins: [pluginReact()],
+  plugins: [pluginReact()]
 });

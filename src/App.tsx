@@ -3,7 +3,11 @@ import {BrowserRouter, Route} from "pure-react-router";
 import {ConfigProvider} from "antd";
 import zhCN from "antd/locale/zh_CN";
 import { routes } from "./routers";
+import { setTwoToneColor } from "@ant-design/icons";
 import "./App.css";
+
+// 设置全局双色图标主色
+setTwoToneColor("#1688ff");
 
 function App() {
   return (
@@ -12,7 +16,7 @@ function App() {
         locale={zhCN}
         theme={{
           token: {
-            colorPrimary: "#1b88ff",
+            colorPrimary: "#1688ff",
           },
         }}
       >
