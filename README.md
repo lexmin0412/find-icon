@@ -13,3 +13,7 @@
 - PNPM V7
 - Rsbuild V1
 - Jest V29
+
+## 站点截图
+
+![ScreenShot](./docs/screenshot.jpg)
