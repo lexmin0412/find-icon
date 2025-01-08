@@ -22,11 +22,9 @@ function Home() {
   const [modalOpen, setModalOpen] = useState(false);
   const [form] = Form.useForm();
 
-  const [curLib, setCurLib] =
-    useState<keyof typeof LibConfig>("Ant Design");
+  const [curLib, setCurLib] = useState<keyof typeof LibConfig>("Ant Design");
 
-  const iconTypeOptions = LibConfig[curLib].typeOptions;
-  const iconList = LibConfig[curLib].iconList;
+  const { typeOptions, iconList, filter } = LibConfig[curLib];
 
   useEffect(() => {
     if (!modalOpen) {
@@ -35,9 +33,9 @@ function Home() {
   }, [modalOpen]);
 
   useEffect(() => {
-    setIconType(iconTypeOptions[0].value);
+    setIconType(typeOptions[0].value);
     handleFakeFetch({
-      iconType: iconTypeOptions[0].value,
+      iconType: typeOptions[0].value,
     });
   }, [curLib]);
 
@@ -50,14 +48,7 @@ function Home() {
     (options?: { iconType: string }) => {
       const filterType = options?.iconType || (iconType as string);
 
-      const allIcons = Object.entries(iconList)
-        .filter(
-          ([name]) =>
-          {
-            return iconTypeOptions.some((iconType)=>name.endsWith(iconType.value))
-          }
-        )
-        .filter(([name]) => name.endsWith(filterType));
+      const allIcons = filter ? filter(filterType, iconList) : iconList;
 
       if (!searchTerm) {
         setVisibleIcons(allIcons);
@@ -128,7 +119,7 @@ function Home() {
               iconType: value as string,
             });
           }}
-          options={iconTypeOptions}
+          options={typeOptions}
         />
         <Input.Search
           placeholder="尽量简短地描述你的图标"
@@ -153,8 +144,8 @@ function Home() {
                     key={name}
                     className="w-[150px] text-center hover:bg-blue-600 hover:text-white cursor-pointer text-gray-800"
                   >
-                    <Icon className="text-4xl" />
-                    <p className="mt-2.5 text-xs">
+                    <Icon className="text-4xl" color="primary" />
+                    <p className="mt-2.5 text-xs truncate">
                       {name.replace("Outlined", "")}
                     </p>
                   </Card>
