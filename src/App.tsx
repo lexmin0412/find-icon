@@ -20,7 +20,7 @@ function App() {
           },
         }}
       >
-        <BrowserRouter routes={routes} basename="/react-template">
+        <BrowserRouter routes={routes} basename="/find-icon">
           <Route />
         </BrowserRouter>
       </ConfigProvider>

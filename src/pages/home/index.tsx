@@ -74,7 +74,7 @@ function Home() {
   );
 
   return (
-    <div className="pt-36 mx-36">
+    <div className="py-36 mx-36">
       <div className="text-center mb-6 text-5xl font-bold">Find Icon</div>
       <div className="mb-12 text-center text-gray-600">
         Find icon compatible with{" "}
@@ -89,7 +89,7 @@ function Home() {
             ],
           }}
         >
-          <span className="text-blue-700">Ant Design <Icons.SwapOutlined className="text-sm" /></span>
+          <span className="text-blue-700 cursor-pointer">Ant Design <Icons.SwapOutlined className="text-sm" /></span>
         </Dropdown>
       </div>
       <div className="flex items-center">

@@ -8,7 +8,7 @@ export default defineConfig({
     favicon: './public/favicon.ico',
   },
   server: {
-    base: '/react-template',
+    base: '/find-icon',
 		host: '0.0.0.0',
     port: 5200,
   },

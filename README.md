@@ -54,7 +54,7 @@ pnpm install
 
 ```
 git init
-git remote add origin git@github.com:lexmin0412/react-template.git
+git remote add origin git@github.com:lexmin0412/find-icon.git
 git add .
 git commit -m 'feat: init project'
 git push -u origin master
@@ -109,7 +109,7 @@ git push -u origin master
 
 ```ts
 export default defineConfig({
-	base: '/react-template/'
+	base: '/find-icon/'
 })
 ```
 
@@ -197,7 +197,7 @@ jobs:
 推送代码到 master，查看 repo 的 Actions 面板，等待 CI 流程执行完毕后，进入 Settings => Pages，稍等片刻（一两分钟）后，上方就会出现类似如下的文案：
 
 ```txt
-Your site is live at https://lexmin0412.github.io/react-template/
+Your site is live at https://lexmin0412.github.io/find-icon/
 ```
 
 点击链接即可访问，后续只要推送代码，就会触发 action 重新部署。
