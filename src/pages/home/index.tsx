@@ -2,6 +2,7 @@ import { useMount, useRequest } from "ahooks";
 import {
   Card,
   Dropdown,
+  Empty,
   Form,
   Input,
   message,
@@ -151,23 +152,28 @@ function Home() {
       </div>
 
       <Spin spinning={fetchLoading}>
-        <Space wrap className="mt-6">
-          {visibleIcons.map(([name, Icon]) => {
-            return (
-              <CopyWrapper key={name} content={`<${name} />`}>
-                <Card
-                  key={name}
-                  className="w-[150px] text-center hover:bg-blue-600 hover:text-white cursor-pointer text-gray-800"
-                >
-                  <Icon className="text-4xl" />
-                  <p className="mt-2.5 text-xs">
-                    {name.replace("Outlined", "")}
-                  </p>
-                </Card>
-              </CopyWrapper>
-            );
-          })}
-        </Space>
+        {
+          visibleIcons?.length ?
+          <Space wrap className="mt-6">
+            {visibleIcons.map(([name, Icon]) => {
+              return (
+                <CopyWrapper key={name} content={`<${name} />`}>
+                  <Card
+                    key={name}
+                    className="w-[150px] text-center hover:bg-blue-600 hover:text-white cursor-pointer text-gray-800"
+                  >
+                    <Icon className="text-4xl" />
+                    <p className="mt-2.5 text-xs">
+                      {name.replace("Outlined", "")}
+                    </p>
+                  </Card>
+                </CopyWrapper>
+              );
+            })}
+          </Space>
+          : 
+          <Empty className="mt-6" description='暂无数据' />
+        }
       </Spin>
 
       <Modal
