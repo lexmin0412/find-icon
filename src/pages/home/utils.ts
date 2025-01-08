@@ -6,16 +6,25 @@ interface IApiConfigData {
   workflowId?: string
 }
 
+// 扣子工作流 API
+const apiUrl = 'https://api.coze.cn/v1/workflow/run'
+// 扣子工作流 ID
+const workflowId = '7456740588374999075'
+
 /**
  * API 配置
  */
 class ApiConfigConstructor {
   getConfig() {
-    return JSON.parse(localStorage.getItem('apiConfig') || '{}') as IApiConfigData
+		return {
+      apiUrl,
+			apiSecret: localStorage.getItem('FIND_ICON_API_KEY'),
+      workflowId
+		} as IApiConfigData
   }
 
-  setConfig(config: IApiConfigData) {
-    localStorage.setItem('apiConfig', JSON.stringify(config))
+  setConfig(apiSecret: string) {
+		localStorage.setItem('FIND_ICON_API_KEY', apiSecret)
   }
 }
 
