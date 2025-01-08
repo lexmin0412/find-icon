@@ -2,14 +2,18 @@ import { useMount, useRequest } from "ahooks";
 import {
   Card,
   Dropdown,
+  Form,
   Input,
+  message,
+  Modal,
   Segmented,
   Space,
   Spin,
 } from "antd";
 import * as Icons from "@ant-design/icons";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import CopyWrapper from "@/components/copy-wrapper";
+import { ApiConfig, runWorkflow } from "./utils";
 
 type IIconType = "Outlined" | "Filled" | "TwoTone";
 
@@ -28,14 +32,22 @@ const iconTypeOptions = [
   },
 ];
 
-const DefaultIconType = iconTypeOptions[0].value as IIconType
+const DefaultIconType = iconTypeOptions[0].value as IIconType;
 
 function Home() {
   const [iconType, setIconType] = useState<IIconType>(DefaultIconType);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [form] = Form.useForm();
 
-  useMount(()=>{
-    handleFakeFetch({iconType: DefaultIconType})
-  })
+  useEffect(() => {
+    if (!modalOpen) {
+      form.resetFields();
+    }
+  }, [modalOpen]);
+
+  useMount(() => {
+    handleFakeFetch({ iconType: DefaultIconType });
+  });
 
   const [searchTerm, setSearchTerm] = useState("");
   const [visibleIcons, setVisibleIcons] = useState<
@@ -44,38 +56,58 @@ function Home() {
 
   const { loading: fetchLoading, runAsync: handleFakeFetch } = useRequest(
     (options?: { iconType: IIconType }) => {
-      // 将 filteredIcons 按照类型分组
-
-      const allIcons = Object.entries(Icons).filter(
-        ([name]) =>
-          name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-          (name.endsWith("Outlined") ||
-            name.endsWith("Filled") ||
-            name.endsWith("TwoTone"))
-      );
-
       const filterType = options?.iconType || (iconType as string);
-      const result = allIcons.filter(([name]) => name.endsWith(filterType));
 
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          setVisibleIcons(result);
-          resolve(result);
-        }, 500);
+      const allIcons = Object.entries(Icons)
+        .filter(
+          ([name]) =>
+            name.endsWith("Outlined") ||
+            name.endsWith("Filled") ||
+            name.endsWith("TwoTone")
+        )
+        .filter(([name]) => name.endsWith(filterType));
+
+      if (!searchTerm) {
+        setVisibleIcons(allIcons);
+        return;
+      }
+
+      return runWorkflow({
+        input: searchTerm,
+        type: filterType,
+      }).then((res) => {
+        const result = allIcons.filter(([name]) => res.includes(name));
+        setVisibleIcons(result);
+        return result;
       });
     },
     {
       manual: true,
       onSuccess: (res) => {
-        console.log("请求结果", res);
         // message.success("请求成功");
       },
     }
   );
 
   return (
-    <div className="py-36 mx-36">
-      <div className="text-center mb-6 text-5xl font-bold">Find Icon</div>
+    <div className="pb-36 mx-36">
+      <div className="flex items-center justify-end h-10">
+        <Icons.SettingOutlined
+          className="cursor-pointer"
+          onClick={() => {
+            setModalOpen(true);
+            const configData = ApiConfig.getConfig();
+            if (
+              configData.apiUrl &&
+              configData.apiSecret &&
+              configData.workflowId
+            ) {
+              form.setFieldsValue(configData);
+            }
+          }}
+        />
+      </div>
+      <div className="text-center mt-20 mb-6 text-5xl font-bold">Find Icon</div>
       <div className="mb-12 text-center text-gray-600">
         Find icon compatible with{" "}
         <Dropdown
@@ -89,7 +121,9 @@ function Home() {
             ],
           }}
         >
-          <span className="text-blue-700 cursor-pointer">Ant Design <Icons.SwapOutlined className="text-sm" /></span>
+          <span className="text-blue-700 cursor-pointer">
+            Ant Design <Icons.SwapOutlined className="text-sm" />
+          </span>
         </Dropdown>
       </div>
       <div className="flex items-center">
@@ -110,8 +144,8 @@ function Home() {
           onChange={(e) => {
             setSearchTerm(e.target.value);
           }}
-          onSearch={()=>{
-            handleFakeFetch({iconType})
+          onSearch={() => {
+            handleFakeFetch({ iconType });
           }}
         />
       </div>
@@ -135,6 +169,51 @@ function Home() {
           })}
         </Space>
       </Spin>
+
+      <Modal
+        title="配置工作流"
+        open={modalOpen}
+        destroyOnClose
+        onCancel={() => setModalOpen(false)}
+        onOk={async () => {
+          await form.validateFields();
+          const configData = form.getFieldsValue();
+          ApiConfig.setConfig(configData);
+          setModalOpen(false);
+          message.success("保存成功，快试试搜索吧~");
+        }}
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          className="my-6"
+          labelCol={{
+            span: 5,
+          }}
+        >
+          <Form.Item
+            name="apiUrl"
+            label="接口地址"
+            rules={[{ required: true, message: "请输入api地址" }]}
+          >
+            <Input placeholder="请输入 api 地址" />
+          </Form.Item>
+          <Form.Item
+            name="apiSecret"
+            label="API Secret"
+            rules={[{ required: true, message: "API Secret" }]}
+          >
+            <Input.TextArea placeholder="请输入 API Secret" />
+          </Form.Item>
+          <Form.Item
+            name="workflowId"
+            label="工作流 ID"
+            rules={[{ required: true, message: "请输入工作流 ID" }]}
+          >
+            <Input placeholder="请输入工作流 ID" />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 }
