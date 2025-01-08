@@ -1,4 +1,4 @@
-import { useMount, useRequest } from "ahooks";
+import { useRequest } from "ahooks";
 import {
   Card,
   Dropdown,
@@ -11,34 +11,22 @@ import {
   Space,
   Spin,
 } from "antd";
-import * as Icons from "@ant-design/icons";
 import { FunctionComponent, useEffect, useState } from "react";
 import CopyWrapper from "@/components/copy-wrapper";
 import { ApiConfig, runWorkflow } from "./utils";
-
-type IIconType = "Outlined" | "Filled" | "TwoTone";
-
-const iconTypeOptions = [
-  {
-    value: "Outlined",
-    label: "线框风格",
-  },
-  {
-    value: "Filled",
-    label: "实底风格",
-  },
-  {
-    value: "TwoTone",
-    label: "双色风格",
-  },
-];
-
-const DefaultIconType = iconTypeOptions[0].value as IIconType;
+import { LibConfig } from "./config";
+import { SettingOutlined, SwapOutlined } from "@ant-design/icons";
 
 function Home() {
-  const [iconType, setIconType] = useState<IIconType>(DefaultIconType);
+  const [iconType, setIconType] = useState<string>("");
   const [modalOpen, setModalOpen] = useState(false);
   const [form] = Form.useForm();
+
+  const [curLib, setCurLib] =
+    useState<keyof typeof LibConfig>("Ant Design");
+
+  const iconTypeOptions = LibConfig[curLib].typeOptions;
+  const iconList = LibConfig[curLib].iconList;
 
   useEffect(() => {
     if (!modalOpen) {
@@ -46,9 +34,12 @@ function Home() {
     }
   }, [modalOpen]);
 
-  useMount(() => {
-    handleFakeFetch({ iconType: DefaultIconType });
-  });
+  useEffect(() => {
+    setIconType(iconTypeOptions[0].value);
+    handleFakeFetch({
+      iconType: iconTypeOptions[0].value,
+    });
+  }, [curLib]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [visibleIcons, setVisibleIcons] = useState<
@@ -56,15 +47,15 @@ function Home() {
   >([]);
 
   const { loading: fetchLoading, runAsync: handleFakeFetch } = useRequest(
-    (options?: { iconType: IIconType }) => {
+    (options?: { iconType: string }) => {
       const filterType = options?.iconType || (iconType as string);
 
-      const allIcons = Object.entries(Icons)
+      const allIcons = Object.entries(iconList)
         .filter(
           ([name]) =>
-            name.endsWith("Outlined") ||
-            name.endsWith("Filled") ||
-            name.endsWith("TwoTone")
+          {
+            return iconTypeOptions.some((iconType)=>name.endsWith(iconType.value))
+          }
         )
         .filter(([name]) => name.endsWith(filterType));
 
@@ -76,6 +67,7 @@ function Home() {
       return runWorkflow({
         input: searchTerm,
         type: filterType,
+        lib: curLib,
       }).then((res) => {
         const result = allIcons.filter(([name]) => res.includes(name));
         setVisibleIcons(result);
@@ -84,16 +76,13 @@ function Home() {
     },
     {
       manual: true,
-      onSuccess: (res) => {
-        // message.success("请求成功");
-      },
     }
   );
 
   return (
     <div className="pb-36 mx-36">
       <div className="flex items-center justify-end h-10">
-        <Icons.SettingOutlined
+        <SettingOutlined
           className="cursor-pointer"
           onClick={() => {
             setModalOpen(true);
@@ -114,16 +103,19 @@ function Home() {
         <Dropdown
           arrow
           menu={{
-            items: [
-              {
-                label: "Ant Design",
-                key: "antd",
-              },
-            ],
+            items: Object.keys(LibConfig).map((key) => {
+              return {
+                label: key,
+                key: key,
+                onClick: () => {
+                  setCurLib(key as keyof typeof LibConfig);
+                },
+              };
+            }),
           }}
         >
           <span className="text-blue-700 cursor-pointer">
-            Ant Design <Icons.SwapOutlined className="text-sm" />
+            {curLib} <SwapOutlined className="text-sm" />
           </span>
         </Dropdown>
       </div>
@@ -131,9 +123,9 @@ function Home() {
         <Segmented
           value={iconType}
           onChange={(value) => {
-            setIconType(value as IIconType);
+            setIconType(value as string);
             handleFakeFetch({
-              iconType: value as IIconType,
+              iconType: value as string,
             });
           }}
           options={iconTypeOptions}
@@ -152,8 +144,7 @@ function Home() {
       </div>
 
       <Spin spinning={fetchLoading}>
-        {
-          visibleIcons?.length ?
+        {visibleIcons?.length ? (
           <Space wrap className="mt-6">
             {visibleIcons.map(([name, Icon]) => {
               return (
@@ -171,9 +162,9 @@ function Home() {
               );
             })}
           </Space>
-          : 
-          <Empty className="mt-6" description='暂无数据' />
-        }
+        ) : (
+          <Empty className="mt-6" description="暂无数据" />
+        )}
       </Spin>
 
       <Modal

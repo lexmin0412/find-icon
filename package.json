@@ -14,6 +14,7 @@
     "@ant-design/icons": "^5.5.2",
     "ahooks": "^3.7.8",
     "antd": "^5.12.8",
+    "antd-mobile-icons": "^0.3.0",
     "dayjs": "^1.11.9",
     "pure-react-router": "^0.0.3",
     "react": "^18.2.0",

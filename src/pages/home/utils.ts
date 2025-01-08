@@ -27,6 +27,7 @@ export const ApiConfig = new ApiConfigConstructor()
 export const runWorkflow = async(params: {
   input: string
   type: string
+  lib: string
 }) => {
   const result = await fetch(ApiConfig.getConfig().apiUrl!, {
     method: 'POST',
