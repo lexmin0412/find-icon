@@ -1,6 +1,6 @@
 # Find Icon
 
-快速找到符合需求且契合指定 UI 库风格的图标，基于扣子工作流+知识库，已支持 Ant Design、Ant Design Mobile、Material UI。
+快速找到符合需求的 UI 库配套图标，基于扣子工作流+知识库，已支持 Ant Design、Ant Design Mobile、Material UI。
 
 ## 技术栈
 
