@@ -49,8 +49,16 @@ export const runWorkflow = async(params: {
       'Authorization': `Bearer ${ApiConfig.getConfig().apiSecret}`,
     },
   }).then((res)=>res.json())
-  const { code, data } = result
+  const { code, data, msg } = result
   if (code !== 0) {
+    switch (code) {
+      case 4013:
+        message.error('已达到调用频率上线，请稍后再试')
+        break;
+      default:
+        message.error(`调用失败: ${msg}`)
+        break;
+    }
     return []
   }
   try {
