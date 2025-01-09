@@ -90,7 +90,7 @@ function Home() {
   );
 
   return (
-    <div className="pb-4 mx-36">
+    <div className="pb-4 xs:mx-0 w-full sm:w-auto sm:mx-4 md:mx-12 lg:mx-36">
       {showWarning ? (
         <div className="flex items-center h-10">
           <Alert
@@ -146,30 +146,35 @@ function Home() {
           </span>
         </Dropdown>
       </div>
-      <div className="flex items-center">
-        <Segmented
-          value={iconType}
-          onChange={(value) => {
-            setIconType(value as string);
-            handleFakeFetch({
-              iconType: value as string,
-            });
-          }}
-          options={typeOptions}
-        />
-        <Input.Search
-          placeholder="尽量简短地描述你的图标"
-          className="w-full ml-3"
-          onSearch={(value: string) => {
-            setSearchTerm(value)
-            handleFakeFetch({iconType, searchTerm: value});
-          }}
-        />
+      <div className="sm:flex sm:items-center px-0 sm:mx-4 md:mx-auto">
+        <div className="flex sm:inline-block justify-center">
+          <Segmented
+            value={iconType}
+            onChange={(value) => {
+              setIconType(value as string);
+              handleFakeFetch({
+                iconType: value as string,
+              });
+            }}
+            options={typeOptions}
+          />
+        </div>
+        <div className="w-full px-6 sm:px-0 box-border ml-0 sm:ml-3">
+          <Input.Search
+            placeholder="尽量简短地描述你的图标"
+            className="w-full ml-auto sm:ml-0 mr-auto sm:mr-0 mt-3 sm:mt-0"
+            onSearch={(value: string) => {
+              setSearchTerm(value)
+              handleFakeFetch({iconType, searchTerm: value});
+            }}
+          />
+        </div>
       </div>
 
       <Spin spinning={fetchLoading}>
         {visibleIcons?.length ? (
-          <Row gutter={[16, 24]} className="mt-6">
+          <div className="px-6 sm:px-0">
+            <Row gutter={[16, 24]} className="mt-6">
             {visibleIcons.map(([name, Icon]) => {
               return (
                 <Col
@@ -196,6 +201,7 @@ function Home() {
               );
             })}
           </Row>
+          </div>
         ) : (
           <Empty className="mt-6" description="暂无数据" />
         )}
