@@ -17,6 +17,9 @@ dependencies:
   '@mui/icons-material':
     specifier: ^6.3.1
     version: 6.3.1(@mui/material@6.3.1)(@types/react@18.2.20)(react@18.2.0)
+  '@toolkit-fe/clipboard':
+    specifier: ^0.1.22
+    version: 0.1.22
   ahooks:
     specifier: ^3.7.8
     version: 3.7.8(react@18.2.0)
@@ -2473,6 +2476,10 @@ packages:
     dependencies:
       '@testing-library/dom': 9.3.1
     dev: true
+
+  /@toolkit-fe/clipboard@0.1.22:
+    resolution: {integrity: sha512-mo4tVLUJLCmkVwJVjnDLIXRKIOEIBlwN3W17ekt2jYyJIUgihBmsVjxRAuS7kMpYGkBrCLvKCOHJHBdDvWUfmw==}
+    dev: false
 
   /@tootallnate/once@2.0.0:
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}

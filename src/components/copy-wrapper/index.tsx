@@ -1,6 +1,6 @@
-import { message, Tooltip } from 'antd'
+import { message } from 'antd'
 
-import { copyToClipboard } from '@/utils/clipboard'
+import { copyToClipboard } from '@toolkit-fe/clipboard'
 
 interface ICopyWrapperProps {
 	/**
