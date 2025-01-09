@@ -29,6 +29,7 @@ function Home() {
   const [curLib, setCurLib] = useState<keyof typeof LibConfig>("Ant Design");
 
   const {typeOptions, iconList, filter} = LibConfig[curLib];
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     if (!modalOpen) {
@@ -50,22 +51,19 @@ function Home() {
     });
   }, [curLib]);
 
-  const [searchTerm, setSearchTerm] = useState("");
-  // const [visibleIcons, setVisibleIcons] = useState<
-  //   Array<[string, FunctionComponent]>
-  // >([]);
-
   const {
     loading: fetchLoading,
     runAsync: handleFakeFetch,
     data: visibleIcons,
   } = useRequest(
-    (options?: {iconType: string}) => {
+    (options?: {iconType: string, searchTerm?: string}) => {
+      
+      const searchValue = options?.searchTerm ?? searchTerm
       const filterType = options?.iconType || (iconType as string);
 
       const allIcons = filter ? filter(filterType, iconList) : iconList;
 
-      if (!searchTerm) {
+      if (!searchValue) {
         return allIcons.slice(0, 20);
       }
 
@@ -73,18 +71,18 @@ function Home() {
 
       if (!configData?.apiSecret) {
         return allIcons.filter(([name]) =>
-          name.toLowerCase().includes(searchTerm.toLowerCase())
+          name.toLowerCase().includes(searchValue.toLowerCase())
         );
       }
 
       return runWorkflow({
-        input: searchTerm,
+        input: searchValue,
         type: filterType,
         lib: curLib,
       }).then((res) => {
         const result = allIcons.filter(([name]) => res.includes(name));
         return result;
-      });
+      })
     },
     {
       manual: true,
@@ -162,12 +160,9 @@ function Home() {
         <Input.Search
           placeholder="尽量简短地描述你的图标"
           className="w-full ml-3"
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-          }}
-          onSearch={() => {
-            handleFakeFetch({iconType});
+          onSearch={(value: string) => {
+            setSearchTerm(value)
+            handleFakeFetch({iconType, searchTerm: value});
           }}
         />
       </div>
