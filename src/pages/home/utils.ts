@@ -53,7 +53,7 @@ export const runWorkflow = async(params: {
   if (code !== 0) {
     switch (code) {
       case 4013:
-        message.error('已达到调用频率上线，请稍后再试')
+        message.error('已达到调用频率上限，请稍后再试')
         break;
       default:
         message.error(`调用失败: ${msg}`)
