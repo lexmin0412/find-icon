@@ -222,7 +222,7 @@ function Home() {
                     >
                       <Icon className="text-4xl" color="primary" />
                       <p className="mt-2.5 text-xs truncate">
-                        {name.replace("Outlined", "")}
+                        {name}
                       </p>
                     </Card>
                   </CopyWrapper>
