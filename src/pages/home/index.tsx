@@ -1,4 +1,4 @@
-import {useMount, useRequest} from "ahooks";
+import { useMount, useRequest } from "ahooks";
 import {
   Alert,
   Button,
@@ -14,11 +14,12 @@ import {
   Segmented,
   Spin,
 } from "antd";
-import {useEffect, useState} from "react";
+import { forwardRef, useEffect, useState } from "react";
 import CopyWrapper from "@/components/copy-wrapper";
-import {ApiConfig, runWorkflow} from "./utils";
-import {LibConfig} from "./config";
-import {InfoCircleFilled, SwapOutlined} from "@ant-design/icons";
+import { ApiConfig, runWorkflow } from "./utils";
+import { LibConfig } from "./config";
+import { InfoCircleFilled, SwapOutlined } from "@ant-design/icons";
+import { VirtuosoGrid } from "react-virtuoso";
 
 function Home() {
   const [iconType, setIconType] = useState<string>("");
@@ -28,7 +29,7 @@ function Home() {
 
   const [curLib, setCurLib] = useState<keyof typeof LibConfig>("Ant Design");
 
-  const {typeOptions, iconList, filter} = LibConfig[curLib];
+  const { typeOptions, iconList, filter } = LibConfig[curLib];
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
@@ -56,15 +57,14 @@ function Home() {
     runAsync: handleFakeFetch,
     data: visibleIcons,
   } = useRequest(
-    (options?: {iconType: string, searchTerm?: string}) => {
-      
-      const searchValue = options?.searchTerm ?? searchTerm
+    (options?: { iconType: string; searchTerm?: string }) => {
+      const searchValue = options?.searchTerm ?? searchTerm;
       const filterType = options?.iconType || (iconType as string);
 
       const allIcons = filter ? filter(filterType, iconList) : iconList;
 
       if (!searchValue) {
-        return allIcons.slice(0, 20);
+        return allIcons;
       }
 
       const configData = ApiConfig.getConfig();
@@ -82,15 +82,49 @@ function Home() {
       }).then((res) => {
         const result = allIcons.filter(([name]) => res.includes(name));
         return result;
-      })
+      });
     },
     {
       manual: true,
     }
   );
 
+  const gridComponents = {
+    List: forwardRef(({ style, children, ...props }, ref) => (
+      <Row
+        gutter={[16, 24]}
+        ref={ref}
+        {...props}
+        style={{
+          ...style,
+        }}
+      >
+        {children}
+      </Row>
+    )),
+    Item: ({ children, ...props }) => (
+      <Col className="gutter-row" xs={24} sm={12} md={8} lg={6} xl={4}>
+        <div
+          className="flex flex-1 shrink-0 text-center p-2 whitespace-nowrap"
+          {...props}
+        >
+          {children}
+        </div>
+      </Col>
+    ),
+  };
+
+  const ItemWrapper = ({ children, ...props }) => (
+    <div
+      {...props}
+      className="flex flex-1 shrink-0 text-center whitespace-nowrap"
+    >
+      {children}
+    </div>
+  );
+
   return (
-    <div className="pb-4 xs:mx-0 w-full sm:w-auto sm:mx-4 md:mx-12 lg:mx-36">
+    <div className="pb-4 xs:mx-0 w-full sm:w-auto sm:mx-4 md:mx-12 lg:mx-36 flex flex-col">
       {showWarning ? (
         <div className="flex items-center h-10">
           <Alert
@@ -99,7 +133,8 @@ function Home() {
               <div className="flex items-center justify-center">
                 <InfoCircleFilled className="text-orange-400" />
                 <span className="px-1">
-                  注意：你没有配置 API Secret，搜索时将使用文本匹配，无法调用知识库。
+                  注意：你没有配置 API
+                  Secret，搜索时将使用文本匹配，无法调用知识库。
                 </span>
                 <Button
                   type="link"
@@ -146,7 +181,7 @@ function Home() {
           </span>
         </Dropdown>
       </div>
-      <div className="sm:flex sm:items-center px-0 sm:mx-4 md:mx-auto">
+      <div className="sm:flex sm:items-center px-0 sm:mx-4 md:mx-0">
         <div className="flex sm:inline-block justify-center">
           <Segmented
             value={iconType}
@@ -164,8 +199,8 @@ function Home() {
             placeholder="尽量简短地描述你的图标"
             className="w-full ml-auto sm:ml-0 mr-auto sm:mr-0 mt-3 sm:mt-0"
             onSearch={(value: string) => {
-              setSearchTerm(value)
-              handleFakeFetch({iconType, searchTerm: value});
+              setSearchTerm(value);
+              handleFakeFetch({ iconType, searchTerm: value });
             }}
           />
         </div>
@@ -173,19 +208,13 @@ function Home() {
 
       <Spin spinning={fetchLoading}>
         {visibleIcons?.length ? (
-          <div className="px-6 sm:px-0">
-            <Row gutter={[16, 24]} className="mt-6">
-            {visibleIcons.map(([name, Icon]) => {
-              return (
-                <Col
-                  className="gutter-row"
-                  xs={24}
-                  sm={12}
-                  md={8}
-                  lg={6}
-                  xl={4}
-                  key={name}
-                >
+          <div className="px-6 sm:px-0 mt-6">
+            <VirtuosoGrid
+              style={{ height: 600, width: "100%", boxSizing: "border-box" }}
+              data={visibleIcons}
+              components={gridComponents}
+              itemContent={(_index, [name, Icon]) => (
+                <ItemWrapper key={name}>
                   <CopyWrapper content={`<${name} />`}>
                     <Card
                       key={name}
@@ -197,10 +226,9 @@ function Home() {
                       </p>
                     </Card>
                   </CopyWrapper>
-                </Col>
-              );
-            })}
-          </Row>
+                </ItemWrapper>
+              )}
+            />
           </div>
         ) : (
           <Empty className="mt-6" description="暂无数据" />
@@ -216,7 +244,7 @@ function Home() {
           await form.validateFields();
           const configData = form.getFieldsValue();
           ApiConfig.setConfig(configData.apiSecret);
-					setShowWarning(false)
+          setShowWarning(false);
           setModalOpen(false);
           message.success("配置成功，快试试搜索吧~");
         }}
@@ -229,27 +257,13 @@ function Home() {
             span: 5,
           }}
         >
-          {/* <Form.Item
-            name="apiUrl"
-            label="接口地址"
-            rules={[{required: true, message: "请输入api地址"}]}
-          >
-            <Input placeholder="请输入 api 地址" />
-          </Form.Item> */}
           <Form.Item
             name="apiSecret"
             label="API Secret"
-            rules={[{required: true, message: "API Secret"}]}
+            rules={[{ required: true, message: "API Secret" }]}
           >
             <Input.TextArea placeholder="请输入 API Secret" />
           </Form.Item>
-          {/* <Form.Item
-            name="workflowId"
-            label="工作流 ID"
-            rules={[{required: true, message: "请输入工作流 ID"}]}
-          >
-            <Input placeholder="请输入工作流 ID" />
-          </Form.Item> */}
         </Form>
       </Modal>
     </div>

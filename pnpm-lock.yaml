@@ -41,6 +41,9 @@ dependencies:
   react-dom:
     specifier: ^18.2.0
     version: 18.2.0(react@18.2.0)
+  react-virtuoso:
+    specifier: ^4.12.3
+    version: 4.12.3(react-dom@18.2.0)(react@18.2.0)
 
 devDependencies:
   '@babel/core':
@@ -5981,6 +5984,17 @@ packages:
       dom-helpers: 5.2.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /react-virtuoso@4.12.3(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-6X1p/sU7hecmjDZMAwN+r3go9EVjofKhwkUbVlL8lXhBZecPv9XVCkZ/kBPYOr0Mv0Vl5+Ziwgexg9Kh7+NNXQ==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: '>=16 || >=17 || >= 18'
+      react-dom: '>=16 || >=17 || >= 18'
+    dependencies:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: false

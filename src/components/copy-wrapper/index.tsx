@@ -29,7 +29,7 @@ export default function CopyWrapper(props: ICopyWrapperProps) {
 		// 	placement="topLeft"
 		// >
 			<span
-				className="hover:underline hover:text-white hover:decoration-dashed cursor-pointer"
+				className="inline-block w-full hover:underline hover:text-white hover:decoration-dashed cursor-pointer"
 				onClick={async () => {
 					await copyToClipboard(content)
 					message.success(`已复制 ${content}`)
